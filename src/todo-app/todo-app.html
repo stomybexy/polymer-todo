@@ -1,0 +1,94 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/app-layout/app-layout.html">
+<link rel="import" href="../../bower_components/polymerfire/firebase-app.html">
+
+<link rel="import" href="todo-view.html">
+<link rel="import" href="todo-auth.html">
+
+<dom-module id="todo-app">
+  <template>
+    <style>
+      :host {
+        display: block;
+        --app-primary-color: #4285f4;
+        --app-secondary-color: black;
+      
+      }
+      
+      app-header {
+        color: #fff;
+        background-color: var(--app-primary-color);
+      }
+      
+      .sign-in-btn {
+        background-color: var(--app-primary-color);
+        color: #fff;
+      }
+      
+      .container {
+        @apply(--layout-horizontal);
+        @apply(--layout-center-justified);
+      }
+    </style>
+
+    <firebase-app name="todo" api-key="AIzaSyCh-UGPMEwUcrbqwVpb8PAN3lDoPdUo4d4" auth-domain="polymer-todo-b9816.firebaseapp.com"
+      database-url="https://polymer-todo-b9816.firebaseio.com">
+    </firebase-app>
+
+    <todo-auth id="auth" user="{{user}}" signed-in="{{signedIn}}"></todo-auth>
+
+
+    <app-header reveals>
+      <app-toolbar>
+        <div main-title>Todo app</div>
+        <template is='dom-if' if="[[signedIn]]">
+          <span>{{user.displayName}}</span>
+          <paper-icon-button on-tap="signOut" icon="account-circle"></paper-icon-button>
+        </template>
+      </app-toolbar>
+    </app-header>
+    <div class="container">
+      <template is="dom-if" if="[[!signedIn]]">
+        <div class="not-signed-in-container">
+          <p>Please Sign in to see your tasks.</p>
+          <paper-button class="sign-in-btn" on-tap="signIn">Sign In</paper-button>
+        </div>
+      </template>
+
+
+      <template is="dom-if" if="[[user]]">
+
+        <todo-view user="[[user]]"></todo-view>
+
+      </template>
+
+    </div>
+
+  </template>
+
+  <script>
+    Polymer({
+
+      is: 'todo-app',
+
+      properties: {
+        user: {
+          type: Object,
+          notify: true
+        },
+        signedIn: {
+          type: Boolean,
+          notify: true
+        }
+      },
+
+      signIn: function() {
+        this.$.auth.signIn();
+      },
+      signOut: function() {
+        this.$.auth.signOut();
+      }
+
+    });
+  </script>
+</dom-module>

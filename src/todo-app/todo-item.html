@@ -1,0 +1,143 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../bower_components/paper-checkbox/paper-checkbox.html">
+<link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="../../bower_components/paper-material/paper-material.html">
+<link href="../../bower_components/iron-icons/iron-icons.html" rel="import">
+
+<dom-module id="todo-item">
+    <template>
+        <style>
+            :host {
+                display: block;
+                box-sizing: border-box;
+                margin-top: 10px;
+            }
+            
+            paper-material {
+                @apply(--layout-horizontal);
+                @apply(--layout-center);
+                min-height: 50px;
+                padding: 10px;
+            }
+            
+            paper-input {
+                @apply(--layout-flex);
+                margin-top: -4px;
+                --paper-input-container-input: {
+                    font-family: 'Roboto Slab';
+                    font-size: 20px;
+                    text-overflow: ellipsis;
+                }
+                ;
+                --paper-input-container-underline: {
+                    opacity: 0;
+                }
+                ;
+            }
+            
+            .btn-cancel {
+                opacity: 0;
+                transition: opacity 0.3s;
+                font-size: 15px;
+                display: none;
+            }
+            
+            paper-checkbox {
+                /* Checkbox has 8px of extra space on top so have to tweak it to center */
+                margin-top: -4px;
+                margin-right: 20px;
+            }
+            
+            paper-checkbox[checked] + paper-input {
+                --paper-input-container-input: {
+                    color: #9E9E9E;
+                    text-decoration: line-through;
+                }
+            }
+            
+            :host:hover .btn-cancel,
+            :host([active]) .btn-cancel {
+                opacity: 1;
+                display: inline;
+            }
+        </style>
+        <paper-material elevation="[[_computeElevation(active)]]">
+            <paper-checkbox on-change="_onEdit" id="checkbox" checked="{{todo.isComplete}}"></paper-checkbox>
+
+            <paper-input o on-change="_onEdit" value="{{todo.label}}" no-label-float></paper-input>
+            <paper-icon-button on-tap="_deleteTodo" class="btn-cancel" icon="delete"></paper-icon-button>
+        </paper-material>
+
+
+    </template>
+
+    <script>
+    Polymer({
+
+      is: 'todo-item',
+      observers: [
+          '_isCompleteChange(todo.isComplete)'
+      ],
+
+      properties: {
+          todo: {
+              type: Object
+          },
+
+          active: {
+              type: Boolean,
+              value: false,
+              reflectToAttribute: true
+          },
+          waitOnEdit: {
+              type: Number,
+              value: 300
+          }
+          
+      },
+      
+      attached: function() {
+        // Delegate focus events with useCapture to figure out if one of our
+        // child elements is being focused or if we're about to blur
+        // All of this fanciness is for the sake of the raised paper effect
+        this.addEventListener('focus', this._activate.bind(this), true);
+        this.addEventListener('blur', this._deactivate.bind(this), true);
+        this.addEventListener('mouseenter', this._activate.bind(this));
+        this.addEventListener('mouseleave', this._deactivate.bind(this));
+      },
+      detached: function() {
+        this.removeEventListener('focus', this._activate.bind(this), true);
+        this.removeEventListener('blur', this._deactivate.bind(this), true);
+        this.removeEventListener('mouseenter', this._activate.bind(this));
+        this.removeEventListener('mouseleave', this._deactivate.bind(this));
+      },
+      _onEdit: function(e) {
+          this.debounce('edit', function() {
+                this.fire('edit-todo', {
+                    todo: this.todo
+                });
+          }.bind(this), this.waitOnEdit);
+      },
+      _deleteTodo: function() {
+          this.fire('delete-todo', {
+              todo: this.todo
+          });
+      },
+      _activate: function() {
+        this.active = true;
+      },
+      _deactivate: function() {
+        this.active = false;
+      },
+      _computeElevation: function(active) {
+          return active ? 2: 0;
+      },
+      _isCompleteChange: function(isComplete) {
+        this.updateStyles();       
+      }
+
+    });
+  </script>
+</dom-module>

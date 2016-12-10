@@ -1,0 +1,78 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+
+<dom-module id="todo-input">
+    <template>
+        <style>
+            :host {
+                display: block;
+                padding-top: 50px;
+                
+            }
+            
+            #input {
+                @apply(--layout-flex);
+            }
+            
+            paper-button {
+                background: var(--app-primary-color);
+                color: #fff;
+            }
+            .container {
+                @apply(--layout-horizontal);
+            }
+        </style>
+        <form class="container" is="iron-form">
+            <paper-input on-keydown="_checkAdd" value="{{todoLabel}}" placeholder="[[placeholder]]" id="input"></paper-input>
+            <paper-button type="submit" on-tap="addTodo" disabled="[[_addButtonDisabled]]">Add</paper-button>
+        </form>
+
+
+    </template>
+
+    <script>
+    Polymer({
+
+      is: 'todo-input',
+
+      properties: {
+          placeholder: {
+              type: String,
+              value: "New todo",
+              notify: true
+          },
+          todoLabel: {
+              type: String,
+              value: ""
+          },
+
+          _addButtonDisabled: {
+              type: Boolean,
+              computed: '_cannotAddTodo(todoLabel)'
+          }
+      },
+
+      addTodo: function() {
+          if(!this.todoLabel || !this.todoLabel.length) {
+              return;
+          }
+          this.fire('new-todo', {
+              label: this.todoLabel
+          });
+          this.todoLabel = "";
+      },
+
+      _checkAdd: function(e) {
+           if (e.keyCode === 13) {
+               this.addTodo();
+           }
+      },
+
+      _cannotAddTodo: function(todoLabel) {
+          return !todoLabel || !todoLabel.length;
+      }
+
+    });
+  </script>
+</dom-module>

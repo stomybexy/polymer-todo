@@ -1,0 +1,48 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/polymerfire/firebase-auth.html">
+
+<dom-module id="todo-auth">
+  <template>
+
+    <firebase-auth id="auth" app-name="todo" user="{{user}}" signed-in="{{signedIn}}" provider="google" on-error="handleError">
+    </firebase-auth>
+
+  </template>
+
+  <script>
+    Polymer({
+      is: 'todo-auth',
+
+      properties: {
+          user: {
+              type: Object,
+              notify: true
+          },
+          signedIn: {
+            type: Boolean,
+            notify: true,
+            reflectToAttribute: true
+          }
+      },
+
+      handleError: function(e) {
+        console.log(e);
+      },
+
+      signIn: function() {
+        this.$.auth.signInWithPopup()
+        .then(function(response) {
+            console.log(response);
+          })
+        .catch(function(error) {
+            console.log(error);
+        });
+      },
+
+      signOut: function() {
+        this.$.auth.signOut();
+      }
+
+    });
+  </script>
+</dom-module>

@@ -1,0 +1,65 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/polymerfire/polymerfire.html">
+
+<dom-module id="todo-data">
+  <template>
+
+    <firebase-query id="query" app-name="todo" path="[[todoPath]]" data="{{todos}}">
+    </firebase-query>
+
+    
+  </template>
+  <script>
+    Polymer({
+
+      is: 'todo-data',
+
+      properties: {
+        todos: {
+          type: Array,
+          notify: true,
+          value: function() {
+            return [
+               
+            ];   
+          },
+        },
+        todo: {
+          type: Object,
+        },
+        user: {
+          type: Object
+        },
+        todoPath: {
+          type: String,
+          computed: "_computePath(user)"
+        }
+        
+      },
+      _computePath: function(user) {
+        return user &&  '/todos/' + user.uid ;
+      },
+      addTodo: function(todo) {
+        this.$.query.ref.push(todo);
+          
+      },
+      deleteTodo: function(todo) {
+        let key = todo.$key;
+        this.$.query.ref.child(key).remove();
+            
+      },
+      saveTodo: function(todo) {
+        let toSave = {
+          label: todo.label,
+          isComplete: !!todo.isComplete
+        };
+
+        let updates = {};
+        updates[todo.$key] = toSave;
+
+        return this.$.query.ref.update(updates);
+      }
+
+    });
+  </script>
+</dom-module>

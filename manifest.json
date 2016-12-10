@@ -1,0 +1,7 @@
+{
+  "name": "polymer-todo",
+  "short_name": "polymer-todo",
+  "description": "Todo application kata",
+  "start_url": "/",
+  "display": "standalone"
+}

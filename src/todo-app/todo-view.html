@@ -1,0 +1,64 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="todo-data.html">
+<link rel="import" href="todo-item.html">
+<link rel="import" href="todo-input.html">
+
+<dom-module id="todo-view">
+    <template>
+        <style>
+            :host {
+                display: block;
+                padding: 10px;
+                @apply(--layout-horizontal);
+                @apply(--layout-center-justified);
+                @apply(--layout-flex);
+            }
+            
+            .container {
+                max-width: 800px;
+                @apply(--layout-flex);
+            }
+        </style>
+        <div class="container">
+            <todo-data id="data" user="[[user]]" todos="{{todos}}"></todo-data>
+
+            <template is="dom-repeat" items="{{todos}}" as="todo" observe="isComplete">
+                <todo-item on-edit-todo="saveTodo" on-delete-todo="deleteTodo" todo="[[todo]]"></todo-item>
+            </template>
+
+            <todo-input on-new-todo="addTodo"></todo-input>
+        </div>
+
+    </template>
+
+    <script>
+    Polymer({
+
+      is: 'todo-view',
+
+
+      properties: {
+        todos: {
+          type: Array
+        },
+        user: {
+            type: Object,
+            notify: true
+        }
+      },
+      addTodo: function(event) {
+          this.$.data.addTodo({
+              label: event.detail.label,
+              isComplete: false
+          });
+      },
+      deleteTodo: function(event) {
+          this.$.data.deleteTodo(event.detail.todo);
+      },
+      saveTodo: function(event) {
+          this.$.data.saveTodo(event.detail.todo);
+      },
+
+    });
+  </script>
+</dom-module>
